@@ -199,6 +199,8 @@ function updateIp()
         if( diffDate >= (expire * 60 * 60 * 1000) ) 
         {
           delete IPs[oldIP];
+	
+	localStorage.setItem("IPs", JSON.stringify(IPs)); 
           return;
         }    
 
@@ -215,7 +217,7 @@ function updateIp()
 
     IPs[ip] = new Date();
 
-	localStorage.removeItem('IPs');
+	//localStorage.removeItem('IPs');
 
     // 
     localStorage.setItem("IPs", JSON.stringify(IPs)); 
