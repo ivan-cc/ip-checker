@@ -1,0 +1,258 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>IP checker</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <script
+    type="text/javascript"
+    src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"
+    
+  ></script>
+
+
+  <style id="compiled-css" type="text/css">
+      body{
+  font-size:100px; height:100vh; margin:0; padding:0;
+  border:1px solid red;
+      display: flex;
+    justify-content: center; /*Центрирование по горизонтали*/
+    align-items: center;     /*Центрирование по вертикали */
+}
+    /* EOS */
+  </style>
+</head>
+<body>
+    
+
+<div id="inf" style="margin:auto;margin-top:3%;">
+<span>Получаем ip...</span>
+<div id=isp style="font-size:20%;">
+</div>
+<div id=timeUpdate style="font-size:10px;">
+IP получен: <b></b> назад, информация об IP обновлена: <i></i>
+</div>
+<div style="text-align:center; font-size:30%; color:black" id="usedTime"></div>
+<div id=count style="font-size:10px;">
+В браузере сохранено ip: <b></b>
+</div>
+<div id=ipList style="font-size:15%">
+
+</div>
+</div>
+
+
+    <script type="text/javascript">//<![CDATA[
+
+
+//*****************************
+// Через сколько часов считать
+// ip чистым
+//*****************************
+var expire = 12;
+
+
+//*****************************
+// С какой частотой (в секундах)
+// автоматически перепроверять
+// ip. 0 - не перепроверять
+//*****************************
+var interval = 0;
+
+
+
+// НЕ ТРОЖ
+var IPs=JSON.parse(localStorage.getItem("IPs"));
+
+if(IPs == null)
+{
+	IPs = {};
+}
+var lastIP = localStorage.getItem('lastIp');
+var lastIPTime = localStorage.getItem('lastIpTime');
+var oldIP = "";
+
+var dateOptions = {
+	year: 'numeric',
+	month: 'numeric',
+	day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+	timezone: '+3'
+};
+
+var timeOptions = {
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+	timezone: '+3'
+};
+
+
+$('#count b').text( Object.keys(IPs).length );
+
+
+var timeSince = function(date) {
+  if (typeof date !== 'object') {
+    date = new Date(date);
+  }
+
+  var seconds = Math.floor((new Date() - date) / 1000);
+  var intervalType;
+
+  var interval = Math.floor(seconds / 31536000);
+  if (interval >= 1) {
+    intervalType = 'year';
+  } else {
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+      intervalType = 'month';
+    } else {
+      interval = Math.floor(seconds / 86400);
+      if (interval >= 1) {
+        intervalType = 'day';
+      } else {
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) {
+          intervalType = "hour";
+        } else {
+          interval = Math.floor(seconds / 60);
+          if (interval >= 1) {
+            intervalType = "minute";
+          } else {
+            interval = seconds;
+            intervalType = "second";
+          }
+        }
+      }
+    }
+  }
+
+  if (interval > 1 || interval === 0) {
+    intervalType += 's';
+  }
+
+  return interval + ' ' + intervalType;
+};
+
+var updateIpList =  function ()
+{
+	var ipList = [];
+  
+    for (var eachIP in IPs) 
+    {  
+    	var ipDate = new Date(IPs[eachIP]);
+  		ipList.push(  eachIP +' - '+  ipDate.toLocaleString("ru", dateOptions) + ' ('+timeSince(ipDate)+')');  	
+      
+    }
+    
+    $('#ipList').html('<li>' + ipList.join('</li><li>') +'</li>');
+}
+
+function updateIp()
+{
+	updateIpList();
+	console.log('Получаем ip...');
+  $.get('https://json.geoiplookup.io', function(data) {
+    var ip = data.ip;
+    $('#usedTime').text('');
+    
+    $('#timeUpdate i').text( new Date().toLocaleString("ru", timeOptions) );
+    $('#timeUpdate b').text( timeSince(lastIPTime) );    
+    
+    $('#inf span').text(ip);
+    $('#isp').text(data.isp);
+    
+    //изменился ли ip?
+    if(ip == lastIP && interval > 0)
+    {
+    	
+    	$('#inf span').css("color", "green");    
+      return;
+    }
+    lastIP = ip;
+    
+    localStorage.setItem('lastIp', ip);
+    localStorage.setItem('lastIpTime', new Date());
+    lastIPTime = new Date();
+
+    $('#inf span').text(ip);
+    $('#inf span').css("color", "green");
+    
+    $('#timeUpdate i').text( new Date().toLocaleString("ru", timeOptions) );
+    $('#timeUpdate b').text( timeSince(new Date()) );     
+    
+
+
+    //проверим есть ли ip в хранилище
+    for (var oldIP in IPs) 
+    {
+
+        var oldIpDate = new Date(IPs[oldIP]);
+        var diffDate = new Date() - oldIpDate;    
+
+        if( diffDate >= (expire * 60 * 60 * 1000) ) 
+        {
+          delete IPs[oldIP];
+          return;
+        }    
+
+
+      //нашли ip в хранилище
+      if( oldIP == ip)
+      {
+
+        $('#inf span').css("color", "red");
+        $('#usedTime').text('IP был использован ' + oldIpDate.toLocaleString("ru", dateOptions) + ' ('+timeSince(IPs[oldIP])+')' );
+        return;
+      }
+    }
+
+    IPs[ip] = new Date();
+
+		localStorage.removeItem('IPs');
+
+    // 
+    //localStorage.setItem("IPs", JSON.stringify(IPs)); 
+
+
+    //покажем сколько ip в базе
+    $('#count b').text( Object.keys(IPs).length );
+    
+    updateIpList();
+
+
+  });
+
+}
+
+
+
+
+
+
+updateIp();
+if(interval > 0)setInterval(updateIp, (interval*1000));
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //]]></script>
+
+</body>
+</html>
