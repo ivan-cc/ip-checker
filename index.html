@@ -43,6 +43,7 @@ IP получен: <b></b> назад, информация об IP обновл
 <div id=ipList style="font-size:15%">
 
 </div>
+	<br><br><a href="if(confirm('Очистить историю?')){localStorage.removeItem('IPs');alert('ok');updateIp();}">очистить историю ip</a>
 </div>
 
 
@@ -150,7 +151,7 @@ var updateIpList =  function ()
       
     }
     
-    $('#ipList').html('История:<ul><li>' + ipList.join('</li><li>') +'</li></ul>');
+    $('#ipList').html('<b>История:</b><ul><li>' + ipList.join('</li><li>') +'</li></ul>');
 }
 
 function updateIp()
