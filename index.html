@@ -33,7 +33,7 @@
 <span>Получаем ip...</span>
 <div id=isp style="font-size:20%;">
 </div>
-<div id=timeUpdate style="font-size:15%px;">
+<div id=timeUpdate style="font-size:15%;">
 IP получен: <b></b> назад, информация об IP обновлена: <i></i>
 </div>
 <div style="text-align:center; font-size:30%; color:black" id="usedTime"></div>
@@ -214,10 +214,10 @@ function updateIp()
 
     IPs[ip] = new Date();
 
-		localStorage.removeItem('IPs');
+	localStorage.removeItem('IPs');
 
     // 
-    //localStorage.setItem("IPs", JSON.stringify(IPs)); 
+    localStorage.setItem("IPs", JSON.stringify(IPs)); 
 
 
     //покажем сколько ip в базе
