@@ -180,6 +180,8 @@ function updateIp()
     
     $('#timeUpdate i').text( new Date().toLocaleString("ru", timeOptions) );
     $('#timeUpdate b').text( timeSince(lastIPTime) );    
+	  
+	setInterval( function(){$('#timeUpdate b').text( timeSince( lastIPTime ) );}, 1000);
     
     $('#inf span').text(ip);
     $('#isp').text(data.isp);
