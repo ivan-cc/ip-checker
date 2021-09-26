@@ -159,7 +159,11 @@ var updateIpList =  function ()
     for (var eachIP in IPs) 
     {  
     	var ipDate = new Date(IPs[eachIP]);
-  		ipList.push(  eachIP +' - '+  ipDate.toLocaleString("ru", dateOptions) + ' ('+timeSince(ipDate)+')');  	
+	ipList.push( 
+		(eachIP == lastIP ? '<u>' : '' )
+		+ eachIP +' - '+  ipDate.toLocaleString("ru", dateOptions) + ' ('+timeSince(ipDate)+')'
+		+ (eachIP == lastIP ? '</u>' : '')
+	);  	
       
     }
     ipList = ipList.reverse();
