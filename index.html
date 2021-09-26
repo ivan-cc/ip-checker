@@ -163,7 +163,7 @@ var updateIpList =  function ()
   		ipList.push(  eachIP +' - '+  ipDate.toLocaleString("ru", dateOptions) + ' ('+timeSince(ipDate)+')');  	
       
     }
-    
+    ipList = ipList.reverse();
     $('#ipList').html('<b>История:</b><ul><li>' + ipList.join('</li><li>') +'</li></ul>');
 }
 
