@@ -25,6 +25,31 @@
 }
     /* EOS */
   </style>
+	
+	
+	<script>
+//*****************************
+// Через сколько часов считать
+// ip чистым
+//*****************************
+var expire = 12;
+
+
+//*****************************
+// С какой частотой (в секундах)
+// автоматически перепроверять
+// ip. 0 - не перепроверять
+//*****************************
+var interval = 0;
+	    
+
+//*****************************
+// Название профиля для
+// хранилища ip		
+//*****************************		
+var profile = '';		
+	</script>
+	
 </head>
 <body>
     
@@ -43,38 +68,26 @@ IP получен: <b></b> назад, информация об IP обновл
 <div id=ipList style="font-size:15%">
 
 </div>
-	<br><br><a href="javascript:if(confirm('Очистить историю?')){localStorage.removeItem('IPs');alert('ok');document.location.reload();}" style="font-size:10px; color:gray">очистить историю ip</a>
+	<br><br><a href="javascript:if(confirm('Очистить историю?')){localStorage.removeItem('IPs'+profile);alert('ok');document.location.reload();}" style="font-size:10px; color:gray">очистить историю ip</a>
 </div>
 
 
     <script type="text/javascript">//<![CDATA[
 
 
-//*****************************
-// Через сколько часов считать
-// ip чистым
-//*****************************
-var expire = 12;
 
-
-//*****************************
-// С какой частотой (в секундах)
-// автоматически перепроверять
-// ip. 0 - не перепроверять
-//*****************************
-var interval = 0;
 
 
 
 // НЕ ТРОЖ
-var IPs=JSON.parse(localStorage.getItem("IPs"));
+var IPs=JSON.parse(localStorage.getItem("IPs"+profile));
 
 if(IPs == null)
 {
 	IPs = {};
 }
-var lastIP = localStorage.getItem('lastIp');
-var lastIPTime = localStorage.getItem('lastIpTime');
+var lastIP = localStorage.getItem('lastIp'+profile);
+var lastIPTime = localStorage.getItem('lastIpTime'+profile);
 var oldIP = "";
 
 var dateOptions = {
@@ -177,8 +190,8 @@ function updateIp()
     }
     lastIP = ip;
     
-    localStorage.setItem('lastIp', ip);
-    localStorage.setItem('lastIpTime', new Date());
+    localStorage.setItem('lastIp'+profile, ip);
+    localStorage.setItem('lastIpTime'+profile, new Date());
     lastIPTime = new Date();
 
     $('#inf span').text(ip);
@@ -198,10 +211,8 @@ function updateIp()
 
         if( diffDate >= (expire * 60 * 60 * 1000) ) 
         {
-          delete IPs[oldIP];
-	
-	localStorage.setItem("IPs", JSON.stringify(IPs)); 
-          return;
+          delete IPs[oldIP]; 
+          continue;
         }    
 
 
@@ -220,7 +231,7 @@ function updateIp()
 	//localStorage.removeItem('IPs');
 
     // 
-    localStorage.setItem("IPs", JSON.stringify(IPs)); 
+    localStorage.setItem("IPs"+profile, JSON.stringify(IPs)); 
 
 
     //покажем сколько ip в базе
