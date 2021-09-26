@@ -65,10 +65,12 @@ IP получен: <b></b> назад, информация об IP обновл
 <div id=count style="font-size:10px;">
 В браузере сохранено ip: <b></b>
 </div>
-<div id=ipList style="font-size:15%; height: 50%; overflow:scroll">
+<div id=ipList style="font-size:15%; height: 50vh;
+overflow-y: scroll;">
+	История: (<a href="javascript:if(confirm('Очистить историю?')){localStorage.removeItem('IPs'+profile);alert('ok');document.location.reload();}" style="font-size:10px; color:gray">очистить историю ip</a>)
+	<ul></ul>
 
 </div>
-	<br><br><a href="javascript:if(confirm('Очистить историю?')){localStorage.removeItem('IPs'+profile);alert('ok');document.location.reload();}" style="font-size:10px; color:gray">очистить историю ip</a>
 </div>
 
 
@@ -164,7 +166,7 @@ var updateIpList =  function ()
       
     }
     ipList = ipList.reverse();
-    $('#ipList').html('<b>История:</b><ul><li>' + ipList.join('</li><li>') +'</li></ul>');
+    $('#ipList ul').html('<li>' + ipList.join('</li><li>') +'</li>');
 }
 
 function updateIp()
