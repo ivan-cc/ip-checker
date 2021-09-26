@@ -328,9 +328,9 @@ if(pingEnabled == 1)
 {
 ping('www.gstatic.com/inputtools/images/tia.png', function(log){ping_cb(log);});
 
-setInterval( function(){ if(pingEnabled == 1){ping('www.gstatic.com/inputtools/images/tia.png', function(log){ping_cb(log);});}else{ping_cb(0);} }, 5000);
-}
 
+}
+setInterval( function(){ if(pingEnabled == 1){ping('www.gstatic.com/inputtools/images/tia.png', function(log){ping_cb(log);});}else{ping_cb(0);} }, 5000);
 
 updateIp();
 if(interval > 0)setInterval(updateIp, (interval*1000));
