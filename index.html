@@ -62,12 +62,9 @@ var profile = '';
 IP получен: <b></b> назад, информация об IP обновлена: <i></i>
 </div>
 <div style="text-align:center; font-size:30%; color:black" id="usedTime"></div>
-<div id=count style="font-size:10px;">
-В браузере сохранено ip: <b></b>
-</div>
 <div id=ipList style="font-size:15%; height: 50vh;
 overflow-y: scroll;">
-	История: (<a href="javascript:if(confirm('Очистить историю?')){localStorage.removeItem('IPs'+profile);alert('ok');document.location.reload();}" style="font-size:10px; color:gray">очистить историю ip</a>)
+	История (<span id=count><b></b></span>): (<a href="javascript:if(confirm('Очистить историю?')){localStorage.removeItem('IPs'+profile);alert('ok');document.location.reload();}" style="font-size:10px; color:gray">очистить историю ip</a>)
 	<ul></ul>
 
 </div>
