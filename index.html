@@ -49,7 +49,7 @@ var interval = 0;
 var profile = '';
 		
 		
-var pingEnabled=1;		
+		
 	</script>
 	
 </head>
@@ -70,7 +70,12 @@ overflow-y: scroll;">
 	<ul></ul>
 
 </div>
-	<div style="border-top: 1px dotted blue; font-size:12px;"><b>Настройки:</b><br>Считать IP чистым через: <input type=number min=1 max=48 value=12 id=cacheTime size=3>ч. <input type=submit onclick="myExpire=$('#cacheTime').val(); localStorage.setItem('expireCache'+profile, myExpire); alert('Сохранено '+myExpire+'ч.'); return false;" value="Сохранить"></div>
+	<div style="border-top: 1px dotted blue; font-size:12px;">
+		<b>Настройки:</b>
+		<br>Считать IP чистым через: <input type=number min=1 max=48 value=12 id=cacheTime size=3>ч. <input type=submit onclick="myExpire=$('#cacheTime').val(); localStorage.setItem('expireCache'+profile, myExpire); alert('Сохранено '+myExpire+'ч.'); return false;" value="Сохранить">
+		<br>Проверять подключение? <input type=checkbox value=1 id=pingEnabled onclick="localStorage.setItem('pingEnabled', (this.checked ? 1 : 0)); alert('Сохранено');">
+	
+	</div>
 </div>
 
 <img src="./network-connection-48.png" width=0 height=0 alt="">
@@ -92,13 +97,18 @@ if(IPs == null)
 }
 var lastIP = localStorage.getItem('lastIp'+profile);
 var lastIPTime = localStorage.getItem('lastIpTime'+profile);
-var myExpire=localStorage.getItem("expireCache"+profile);
 
+	    
+var pE=localStorage.getItem("pingEnabled");
+var pingEnabled= (pE==1) ? 1 : 0;
+$('#pingEnabled').attr('checked', pingEnabled);
+	    
+	    
+var myExpire=localStorage.getItem("expireCache"+profile);	    
 if(myExpire == null || myExpire <= 0)
 {
 	myExpire = expire;
-}
-
+}	    
 $('#cacheTime').val(myExpire);
 	    
 	    
@@ -264,6 +274,42 @@ function updateIp()
 
 }
 
+function ping_cb(status)
+{
+}		    
+	    
+	    
+function ping(ip, callback) {
+
+    if (!this.inUse) {
+        this.status = 'unchecked';
+        this.inUse = true;
+        this.callback = callback;
+        this.ip = ip;
+        var _that = this;
+        this.img = new Image();
+        this.img.onload = function () {
+            _that.inUse = false;
+            _that.callback('responded');
+
+        };
+        this.img.onerror = function (e) {
+            if (_that.inUse) {
+                _that.inUse = false;
+                _that.callback('responded', e);
+            }
+
+        };
+        this.start = new Date().getTime();
+        this.img.src = "https://" + ip+'?a='+Math.random();
+        this.timer = setTimeout(function () {
+            if (_that.inUse) {
+                _that.inUse = false;
+                _that.callback('timeout');
+            }
+        }, 1500);
+    }
+}
 
 
 
