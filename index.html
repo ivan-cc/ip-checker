@@ -68,6 +68,7 @@ overflow-y: scroll;">
 	<ul></ul>
 
 </div>
+	<div>Считать IP чистым через: <input type=number min=1 max=48 value=12 id=cacheTime>ч. <inpu type=submit onclick="myExpire=$('#cacheTime').val(); localStorage.setItem("expireCache"+profile, myExpire); alert('Сохранено '+myExpire+'ч.');" value="Сохранить"></div>
 </div>
 
 
@@ -87,6 +88,15 @@ if(IPs == null)
 }
 var lastIP = localStorage.getItem('lastIp'+profile);
 var lastIPTime = localStorage.getItem('lastIpTime'+profile);
+var myExpire=localStorage.getItem("expireCache"+profile);
+
+if(myExpire == null || myExpire <= 0)
+{
+	myExpire = expire;
+}
+		    
+	    
+	    
 var oldIP = "";
 
 var dateOptions = {
@@ -214,7 +224,7 @@ function updateIp()
         var oldIpDate = new Date(IPs[oldIP]);
         var diffDate = new Date() - oldIpDate;    
 
-        if( diffDate >= (expire * 60 * 60 * 1000) ) 
+        if( diffDate >= (myExpire * 60 * 60 * 1000) ) 
         {
           delete IPs[oldIP]; 
           continue;
