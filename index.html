@@ -74,7 +74,7 @@ overflow-y: scroll;">
 	<div style="border-top: 1px dotted blue; font-size:12px;">
 		<b>Настройки:</b>
 		<br>Считать IP чистым через: <input type=number min=1 max=48 value=12 id=cacheTime size=3>ч. <input type=submit onclick="myExpire=$('#cacheTime').val(); localStorage.setItem('expireCache'+profile, myExpire); alert('Сохранено '+myExpire+'ч.'); return false;" value="Сохранить">
-		<br>Проверять подключение? <input type=checkbox value=1 id=pingEnabled onclick="localStorage.setItem('pingEnabled', (this.checked ? 1 : 0)); alert('Сохранено');">
+		<br>Проверять подключение? <input type=checkbox value=1 id=pingEnabled onclick="localStorage.setItem('pingEnabled', (this.checked ? 1 : 0)); if(!this.checked){ping_cb(0);}; alert('Сохранено'); ">
 	
 	</div>
 </div>
