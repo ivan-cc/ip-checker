@@ -82,6 +82,7 @@ overflow-y: scroll;">
 
 <img src="./network-connection-48.png" width=0 height=0 alt="">
 <img src="./no-network-48.png" width=0 height=0 alt="">
+<img src="./200w.webp" width=0 height=0 alt="">
 
     <script type="text/javascript">//<![CDATA[
 
@@ -208,6 +209,9 @@ function updateIp()
 	
 	updateIpList();
 	console.log('Получаем ip...');
+	
+	$('#inf span').html('<img src="./200w.webp" width=100 height=200 alt="Loading..." title="Loading...">');
+	
   $.get('https://json.geoiplookup.io', function(data) {
 	  getIpCount=getIpRetries;
     var ip = data.ip;
