@@ -61,7 +61,7 @@ var getIpRetries = 3;
 <body>
     
 
-<div id="inf" style="margin:auto;margin-top:3%;">
+<div id="inf" style="margin:auto;margin-top:3%; text-align:center">
 	<a href="javascript:updateIp();" style="text-decoration:none; border-bottom:3px dotted;"><span>Получаем ip...</span></a>
 	<div id=pingResult style="font-size:0"></div>
 <div id=isp style="font-size:20%;">
@@ -214,7 +214,7 @@ function updateIp()
 	updateIpList();
 	console.log('Получаем ip...');
 	
-	$('#inf span').html('<img src="./200w.webp" width=100 height=200 alt="Loading..." title="Loading...">');
+	$('#inf span').html('<img src="./200w.webp" width=100 height=100 alt="Loading..." title="Loading...">');
 	
   $.get('https://json.geoiplookup.io', function(data) {
 	  getIpCount=getIpRetries;
