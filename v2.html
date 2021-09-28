@@ -134,6 +134,10 @@ var timeOptions = {
 };
 
 var getIpCount=getIpRetries;
+	    
+$.ajaxSetup({
+  timeout: 10
+});	    
 
 $('#count b').text( Object.keys(IPs).length );
 
