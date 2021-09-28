@@ -283,7 +283,8 @@ function updateIp()
     console.log( "error" );
 	  if(getIpCount)
 	  {
-		updateIp();	  
+		  console.log( "retry..." );
+		setTimeout(updateIp, 3000);
 	  }
 	  
   });
