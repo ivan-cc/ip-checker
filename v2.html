@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>IP checker</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script
+    type="text/javascript"
+    src="./jquery.min.js"
+    ></script>
+
+  <style id="compiled-css" type="text/css">
+      body{
+  font-size:100px; height:100vh; margin:0; padding:0;
+      display: flex;
+    justify-content: center; /*Центрирование по горизонтали*/
+    align-items: center;     /*Центрирование по вертикали */
+}
+    /* EOS */
+  </style>
+	
+	
+	<script>
+//*****************************
+// Через сколько часов считать
+// ip чистым
+//*****************************
+var expire = 12;
+
+
+//*****************************
+// С какой частотой (в секундах)
+// автоматически перепроверять
+// ip. 0 - не перепроверять
+//*****************************
+var interval = 0;
+	    
+
+//*****************************
+// Название профиля для
+// хранилища ip		
+//*****************************		
+var profile = '';
+		
+		
+		
+	</script>
+	
+</head>
+<body>
+    
+
+<div id="inf" style="margin:auto;margin-top:3%;">
+<span>Получаем ip...</span>
+	<div id=pingResult style="font-size:0"></div>
+<div id=isp style="font-size:20%;">
+</div>
+<div id=timeUpdate style="font-size:20%;">
+IP получен: <b></b> назад, информация об IP обновлена: <i></i>
+</div>
+<div style="text-align:center; font-size:30%; color:black" id="usedTime"></div>
+<div id=ipList style="font-size:15%; height: 50vh;
+overflow-y: scroll;">
+	История (<i id=count><b></b></i>): (<a href="javascript:if(confirm('Очистить историю?')){localStorage.removeItem('IPs'+profile);alert('ok');document.location.reload();}" style="font-size:10px; color:gray">очистить историю ip</a>)
+	<ul></ul>
+
+</div>
+	<div style="border-top: 1px dotted blue; font-size:12px;">
+		<b>Настройки:</b>
+		<br>Считать IP чистым через: <input type=number min=1 max=48 value=12 id=cacheTime size=3>ч. <input type=submit onclick="myExpire=$('#cacheTime').val(); localStorage.setItem('expireCache'+profile, myExpire); alert('Сохранено '+myExpire+'ч.'); return false;" value="Сохранить">
+		<br>Проверять подключение? <input type=checkbox value=1 id=pingEnabled onclick="localStorage.setItem('pingEnabled', (this.checked ? 1 : 0)); if(!this.checked){ping_cb(0);}; alert('Сохранено'); ">
+	
+	</div>
+</div>
+
+<img src="./network-connection-48.png" width=0 height=0 alt="">
+<img src="./no-network-48.png" width=0 height=0 alt="">
+	
+    <script type="text/javascript">//<![CDATA[
+
+
+
+
+
+
+// НЕ ТРОЖ
+var IPs=JSON.parse(localStorage.getItem("IPs"+profile));
+
+if(IPs == null)
+{
+	IPs = {};
+}
+var lastIP = localStorage.getItem('lastIp'+profile);
+var lastIPTime = localStorage.getItem('lastIpTime'+profile);
+
+	    
+var pE=localStorage.getItem("pingEnabled");
+var pingEnabled= (pE==1) ? 1 : 0;
+$('#pingEnabled').attr('checked', pingEnabled);
+	    
+	    
+var myExpire=localStorage.getItem("expireCache"+profile);	    
+if(myExpire == null || myExpire <= 0)
+{
+	myExpire = expire;
+}	    
+$('#cacheTime').val(myExpire);
+	    
+	    
+var oldIP = "";
+
+var dateOptions = {
+	year: 'numeric',
+	month: 'numeric',
+	day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+	timezone: '+3'
+};
+
+var timeOptions = {
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+	timezone: '+3'
+};
+
+
+$('#count b').text( Object.keys(IPs).length );
+
+
+var timeSince = function(date) {
+  if (typeof date !== 'object') {
+    date = new Date(date);
+  }
+
+  var seconds = Math.floor((new Date() - date) / 1000);
+  var intervalType;
+
+  var interval = Math.floor(seconds / 31536000);
+  if (interval >= 1) {
+    intervalType = 'year';
+  } else {
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) {
+      intervalType = 'month';
+    } else {
+      interval = Math.floor(seconds / 86400);
+      if (interval >= 1) {
+        intervalType = 'day';
+      } else {
+        interval = Math.floor(seconds / 3600);
+        if (interval >= 1) {
+          intervalType = "hour";
+        } else {
+          interval = Math.floor(seconds / 60);
+          if (interval >= 1) {
+            intervalType = "minute";
+          } else {
+            interval = seconds;
+            intervalType = "second";
+          }
+        }
+      }
+    }
+  }
+
+  if (interval > 1 || interval === 0) {
+    intervalType += 's';
+  }
+
+  return interval + ' ' + intervalType;
+};
+
+var updateIpList =  function ()
+{
+	var ipList = [];
+  
+    for (var eachIP in IPs) 
+    {  
+    	var ipDate = new Date(IPs[eachIP]);
+	ipList.push( 
+		(eachIP == lastIP ? '<u>' : '' )
+		+ eachIP +' - '+  ipDate.toLocaleString("ru", dateOptions) + ' ('+timeSince(ipDate)+')'
+		+ (eachIP == lastIP ? '</u>' : '')
+	);  	
+      
+    }
+    ipList = ipList.reverse();
+    $('#ipList ul').html('<li>' + ipList.join('</li><li>') +'</li>');
+}
+
+function updateIp()
+{
+	updateIpList();
+	console.log('Получаем ip...');
+  $.get('https://json.geoiplookup.io', function(data) {
+    var ip = data.ip;
+    $('#usedTime').text('');
+    
+    $('#timeUpdate i').text( new Date().toLocaleString("ru", timeOptions) );
+    $('#timeUpdate b').text( timeSince(lastIPTime) );    
+	  
+	setInterval( function(){$('#timeUpdate b').text( timeSince( lastIPTime ) );}, 1000);
+    
+    $('#inf span').text(ip);
+    $('#isp').text(data.isp);
+    
+    //изменился ли ip?
+    if(ip == lastIP && interval > 0)
+    {
+    	
+    	$('#inf span').css("color", "green");    
+      return;
+    }
+    lastIP = ip;
+    
+    localStorage.setItem('lastIp'+profile, ip);
+    localStorage.setItem('lastIpTime'+profile, new Date());
+    lastIPTime = new Date();
+
+    $('#inf span').text(ip);
+    $('#inf span').css("color", "green");
+    
+    $('#timeUpdate i').text( new Date().toLocaleString("ru", timeOptions) );
+    $('#timeUpdate b').text( timeSince(new Date()) );     
+    
+
+
+    //проверим есть ли ip в хранилище
+    for (var oldIP in IPs) 
+    {
+
+        var oldIpDate = new Date(IPs[oldIP]);
+        var diffDate = new Date() - oldIpDate;    
+
+        if( diffDate >= (myExpire * 60 * 60 * 1000) ) 
+        {
+          delete IPs[oldIP]; 
+          continue;
+        }    
+
+
+      //нашли ip в хранилище
+      if( oldIP == ip)
+      {
+
+        $('#inf span').css("color", "red");
+        $('#usedTime').text('IP был использован ' + oldIpDate.toLocaleString("ru", dateOptions) + ' ('+timeSince(IPs[oldIP])+')' );
+        return;
+      }
+    }
+
+    IPs[ip] = new Date();
+
+	//localStorage.removeItem('IPs');
+
+    // 
+    localStorage.setItem("IPs"+profile, JSON.stringify(IPs)); 
+
+
+    //покажем сколько ip в базе
+    $('#count b').text( Object.keys(IPs).length );
+    
+    updateIpList();
+
+
+  });
+
+}
+
+function ping_cb(status)
+{
+	if(status == 0)
+	{
+		$('#pingResult').html('');
+	}
+	if( status == 'responded')
+	{
+		$('#pingResult').html('<img width=36 alt="ok" src="./network-connection-48.png" />');	
+	}
+	else
+	{
+		$('#pingResult').html('<img width=36 alt="error" src="./no-network-48.png" />');	
+	}
+}		    
+	    
+	    
+function ping(ip, callback) {
+
+    if (!this.inUse) {
+        this.status = 'unchecked';
+        this.inUse = true;
+        this.callback = callback;
+        this.ip = ip;
+        var _that = this;
+        this.img = new Image();
+        this.img.onload = function () {
+            _that.inUse = false;
+            _that.callback('responded');
+
+        };
+        this.img.onerror = function (e) {
+            if (_that.inUse) {
+                _that.inUse = false;
+                _that.callback('responded', e);
+            }
+
+        };
+        this.start = new Date().getTime();
+        this.img.src = "https://" + ip+'?a='+Math.random();
+        this.timer = setTimeout(function () {
+            if (_that.inUse) {
+                _that.inUse = false;
+                _that.callback('timeout');
+            }
+        }, 1500);
+    }
+}
+
+if(pingEnabled == 1)
+{
+ping('www.gstatic.com/inputtools/images/tia.png', function(log){ping_cb(log);});
+
+
+}
+setInterval( function(){ if(pingEnabled == 1){ping('www.gstatic.com/inputtools/images/tia.png', function(log){ping_cb(log);});}else{ping_cb(0);} }, 5000);
+
+updateIp();
+if(interval > 0)setInterval(updateIp, (interval*1000));
+
+
+
+
+
+
+
+
+
+
+
+
+
+  //]]></script>
+
+</body>
+</html>
