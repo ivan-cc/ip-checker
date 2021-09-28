@@ -48,6 +48,11 @@ var interval = 0;
 var profile = '';
 		
 		
+//*****************************
+// Кол-во повторов на получение IP		
+//*****************************		
+var getIpRetries = 3;
+		
 		
 	</script>
 	
@@ -130,6 +135,7 @@ var timeOptions = {
 	timezone: '+3'
 };
 
+var getIpCount=getIpRetries;
 
 $('#count b').text( Object.keys(IPs).length );
 
@@ -197,9 +203,12 @@ var updateIpList =  function ()
 
 function updateIp()
 {
+	getIpCount--;
+	
 	updateIpList();
 	console.log('Получаем ip...');
   $.get('https://json.geoiplookup.io', function(data) {
+	  getIpCount=getIpRetries;
     var ip = data.ip;
     $('#usedTime').text('');
     
@@ -273,6 +282,11 @@ function updateIp()
   })
 .fail(function() {
     console.log( "error" );
+	  if(getIpCount)
+	  {
+		updateIp();	  
+	  }
+	  
   });
 
 }
