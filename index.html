@@ -58,7 +58,7 @@ var getIpRetries = 6;
 // попыток пинга сигнализировать
 // о возможной смене IP
 //*****************************		
-var breakConnection = 2;		
+var breakConnection = 1;		
 		
 		
 	</script>
@@ -99,7 +99,7 @@ overflow-y: scroll;">
 
 
 
-
+var ipInterval=5000;
 
 // НЕ ТРОЖ
 var IPs=JSON.parse(localStorage.getItem("IPs"+profile));
@@ -325,11 +325,18 @@ function ping_cb(status)
 		}		
 		
 		breakConnectionCount=0;
+		
+		//при коннекте пингуем раз в 5 сек
+		ipInterval=5000;
 	}
 	else
 	{
+		
 		$('#pingResult').html('<img width=36 alt="error" src="./no-network-48.png" />');
 		breakConnectionCount++;
+		
+		//в фооалфне пингуем 1 раз в сек
+		ipInterval=1000;
 	}
 	
 
@@ -374,7 +381,7 @@ ping('www.gstatic.com/inputtools/images/tia.png', function(log){ping_cb(log);});
 
 
 }
-setInterval( function(){ if(pingEnabled == 1){ping('www.gstatic.com/inputtools/images/tia.png', function(log){ping_cb(log);});}else{ping_cb(0);} }, 5000);
+setInterval( function(){ if(pingEnabled == 1){ping('www.gstatic.com/inputtools/images/tia.png', function(log){ping_cb(log);});}else{ping_cb(0);} }, ipInterval);
 
 updateIp();
 if(interval > 0)setInterval(updateIp, (interval*1000));
