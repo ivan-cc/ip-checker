@@ -97,6 +97,8 @@ overflow-y: scroll;">
 	
 	<div id="openWindow">
 	<input type="url" name="link" id="link" style="width: 50%; border:1px solid grey;" placeholder="введи http://... чтобы открыть нужную страницу здесь же"> <button onclick="openFrame();">Открыть</button>
+		
+		<small>для FF поставить <a href="https://addons.mozilla.org/en-US/firefox/addon/ignore-x-frame-options-header/" target=_blank>Ignore X-Frame</a> и отключить защиту, кликнув на замок в строке адреса</small>
 	</div>
 	
 </div>
@@ -421,6 +423,5 @@ if(interval > 0)setInterval(updateIp, (interval*1000));
 
 
   //]]></script>
-<br><br><a href="https://addons.mozilla.org/en-US/firefox/addon/ignore-x-frame-options-header/" target=_blank>Ignore X-Frame</a> & <b>FireFox - about:config security.mixed_content.upgrade_display_content</b>
 </body>
 </html>
